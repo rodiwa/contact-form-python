@@ -23,13 +23,10 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # TODO: update to mongodb
     result3 = yield context.call_activity('Hello', "Seattle")
 
-    # TODO: check if email exists
     isEmailExists = yield context.call_activity('isEmailExists', payload)
 
-    # TODO: send auto email, if valid email
     if (isEmailExists == True):
-        yield context.call_activity('Hello', "Seattle")
-        # TODO: send email block to slack only if email is valid
+        sentEmail = yield context.call_activity('sendEmail', payload)
 
     return [slackNotification, isEmailExists, result3]
 

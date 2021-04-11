@@ -14,10 +14,6 @@ import pytz
 
 
 def notifySlack(name: str):
-    # test
-
-    # test till here
-
     IST = pytz.timezone('Asia/Calcutta')
 
     SLACK_URL = os.environ["SLACK_URL"]
