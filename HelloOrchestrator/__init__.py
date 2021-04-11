@@ -8,15 +8,30 @@
 
 import logging
 import json
-
+import os
 import azure.functions as func
 import azure.durable_functions as df
 
 
 def orchestrator_function(context: df.DurableOrchestrationContext):
-    result1 = yield context.call_activity('Hello', "Tokyo")
-    result2 = yield context.call_activity('Hello', "Seattle")
-    result3 = yield context.call_activity('Hello', "London")
-    return [result1, result2, result3]
+    # get payload passed from httpstarter fn
+    payload = context.get_input()
+
+    # send slack notification
+    slackNotification = yield context.call_activity('notifySlackChannel', payload)
+
+    # TODO: update to mongodb
+    result3 = yield context.call_activity('Hello', "Seattle")
+
+    # TODO: check if email exists
+    isEmailExists = yield context.call_activity('isEmailExists', payload)
+
+    # TODO: send auto email, if valid email
+    if (isEmailExists == True):
+        yield context.call_activity('Hello', "Seattle")
+        # TODO: send email block to slack only if email is valid
+
+    return [slackNotification, isEmailExists, result3]
+
 
 main = df.Orchestrator.create(orchestrator_function)

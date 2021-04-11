@@ -1,0 +1,12 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "name": "name",
+      "message": "message",
+      "email": "email",
+      "type": "activityTrigger",
+      "direction": "in"
+    }
+  ]
+}

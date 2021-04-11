@@ -7,8 +7,10 @@
 # - run pip install -r requirements.txt
 
 import logging
+from validate_email import validate_email
 
 
 def main(name: str) -> str:
-    print(f'inside Hello')
-    return f"Hello {name}!"
+    email = name['email']
+    isEmailExists = validate_email(email_address=email)
+    return isEmailExists
