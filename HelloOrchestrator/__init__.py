@@ -1,14 +1,4 @@
-# This function is not intended to be invoked directly. Instead it will be
-# triggered by an HTTP starter function.
-# Before running this sample, please:
-# - create a Durable activity function (default name is "Hello")
-# - create a Durable HTTP starter function
-# - add azure-functions-durable to requirements.txt
-# - run pip install -r requirements.txt
-
 import logging
-import json
-import os
 import azure.functions as func
 import azure.durable_functions as df
 
@@ -20,15 +10,22 @@ def orchestrator_function(context: df.DurableOrchestrationContext):
     # send slack notification
     slackNotification = yield context.call_activity('notifySlackChannel', payload)
 
-    # TODO: update to mongodb
-    result3 = yield context.call_activity('Hello', "Seattle")
+    # TODO: future; update data to mongodb
+    # not really needed now. works fine with slack + email.
+    # addToDB = yield context.call_activity('addToDB', payload)
 
+    # check if email is valid
     isEmailExists = yield context.call_activity('isEmailExists', payload)
+    logging.info(f'is existing email? {isEmailExists}')
 
+    # send email if valid email
+    sentEmail = False
     if (isEmailExists == True):
+        logging.info('Valid email. Sending email.')
         sentEmail = yield context.call_activity('sendEmail', payload)
+        logging.info('Email sent.')
 
-    return [slackNotification, isEmailExists, result3]
+    return [slackNotification, isEmailExists, sentEmail]
 
 
 main = df.Orchestrator.create(orchestrator_function)

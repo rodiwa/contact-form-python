@@ -1,11 +1,3 @@
-# This function is not intended to be invoked directly. Instead it will be
-# triggered by an orchestrator function.
-# Before running this sample, please:
-# - create a Durable orchestration function
-# - create a Durable HTTP starter function
-# - add azure-functions-durable to requirements.txt
-# - run pip install -r requirements.txt
-
 import logging
 import requests
 import os
@@ -14,6 +6,7 @@ import pytz
 
 
 def notifySlack(name: str):
+    """To notify slack channel that a new message is received."""
     IST = pytz.timezone('Asia/Calcutta')
 
     SLACK_URL = os.environ["SLACK_URL"]
@@ -35,21 +28,6 @@ def notifySlack(name: str):
                       "type": "mrkdwn",
                           "text": formattedMessage
                   }
-              },
-            {
-                  "type": "actions",
-                  "elements": [
-                      {
-                          "type": "button",
-                          "text": {
-                              "type": "plain_text",
-                              "text": "Send Auto Reply",
-                                  "emoji": True
-                          },
-                          "value": "click_me_123",
-                          "action_id": "actionId-0"
-                      }
-                  ]
               }
         ]
     }

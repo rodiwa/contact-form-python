@@ -3,3 +3,4 @@ azure-functions-durable
 requests
 pytz
 py3-validate-email
+mailjet_rest

@@ -1,25 +1,20 @@
-# This function is not intended to be invoked directly. Instead it will be
-# triggered by an orchestrator function.
-# Before running this sample, please:
-# - create a Durable orchestration function
-# - create a Durable HTTP starter function
-# - add azure-functions-durable to requirements.txt
-# - run pip install -r requirements.txt
-
 # Refs
 # https://realpython.com/python-send-email/
 # https://www.geeksforgeeks.org/send-mail-gmail-account-using-python/
+# https://app.mailjet.com/auth/get_started/developer
 
 
+# import smtplib
+# import ssl
+# from email.mime.text import MIMEText
+# from email.mime.multipart import MIMEMultipart
 import logging
-import smtplib
-import ssl
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+from mailjet_rest import Client
 import os
 
 
-def main(name: str) -> str:
+def sendGmail(name: str) -> str:
+    """To send mail using Python SMTP."""
     u = os.environ["EMAIL_USR"]
     p = os.environ["EMAIL_PWD"]
     smtp_server = os.environ["EMAIL_SMTP_SRVR"]
@@ -57,3 +52,53 @@ def main(name: str) -> str:
         )
 
     return
+
+
+def sendSMTPRelay(name: str) -> str:
+    """To send mail using SMTP Relay Mailjet service."""
+    API_KEY = os.environ["MAILJET_API_KEY"]
+    API_SECRET = os.environ["MAILJET_API_SECRET"]
+    FROM_EMAIL = os.environ["MAILJET_FROM_EMAIL"]
+    FROM_EMAIL_USER = os.environ["MAILJET_FROM_EMAIL_NAME"]
+    TO_EMAIL = name['email']
+    TO_EMAIL_USER = name['user_name'].title()
+
+    EMAIL_SUBJECT = "Rohit's bot at your service!"
+    EMAIL_TEXT = "Rohit says hello!"
+    EMAIL_HTML_CONTENT = """\
+    <html>
+      <body>
+        <p>Thank you for checking out the website. Please connect on <a href="https://in.linkedin.com/in/rohitdiwakar">LinkedIn</a> and we can take things forward.</p>
+        <p>Cheers, <br>Rohit's Bot<p>
+      </body>
+    </html>
+    """
+
+    mailjet = Client(auth=(API_KEY, API_SECRET), version='v3.1')
+    data = {
+        'Messages': [
+            {
+                "From": {
+                    "Email": FROM_EMAIL,
+                    "Name": FROM_EMAIL_USER
+                },
+                "To": [
+                    {
+                        "Email": TO_EMAIL,
+                        "Name": TO_EMAIL_USER
+                    }
+                ],
+                "Subject": EMAIL_SUBJECT,
+                "TextPart": EMAIL_TEXT,
+                "HTMLPart": EMAIL_HTML_CONTENT,
+                "CustomID": "AppGettingStartedTest"
+            }
+        ]
+    }
+    result = mailjet.send.create(data=data)
+    return True
+
+
+def main(name: str) -> str:
+    email_response = sendSMTPRelay(name)
+    return email_response
