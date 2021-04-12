@@ -8,7 +8,6 @@ import azure.durable_functions as df
 async def main(req: func.HttpRequest, starter: str) -> func.HttpResponse:
     client = df.DurableOrchestrationClient(starter)
 
-    # payload passed from contact me form
     payload = json.loads(req.get_body())
 
     instance_id = await client.start_new(req.route_params["functionName"], None, payload)
